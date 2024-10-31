@@ -16,6 +16,7 @@ import sys
 import csv
 import time
 import random
+import scripts.data_gen.cvt_aux
 
 import numpy as np
 import nibabel as nib
@@ -23,8 +24,7 @@ from scipy.ndimage import distance_transform_edt
 
 from polnet.lio import load_mrc, write_mrc
 from polnet.utils import *
-
-
+from scripts.data_gen.cvt_aux import gen_blyr_basic, gen_blyr_exp, reduce, gen_lyr
 
 ##### Input parameters
 
@@ -62,11 +62,12 @@ with open(OUT_DIR + '/labels_table.csv', 'w') as file_csv:
 
 # In-out threshold
 thr = 0.0         # Delimits the voxels enclosed by the membrane
-oi_delta = 1.74    # Separation of the bilayer (voxels)
-layer_th = 0.3    # Layer thickness (voxels)
+vx_sz = 10        # Voxel size
+layer_sep = 30  # Separation of the bilayer (armstrongs)
+layer_th = 5   # Layer thickness (armstrongs)
+sigma = 1         # Gaussian filter sigma
 
 # Files loop
-
 for p_id, p_file in enumerate(NII_LIST):
 
     print('\tPROCESSING FILE:', p_file)
@@ -82,132 +83,21 @@ for p_id, p_file in enumerate(NII_LIST):
     ct_den[ct_den<=thr] = 0
     write_mrc(ct_den, fname=OUT_DIR + '/ct_' + str(p_id) + '_den.mrc' , v_size=1)
 
-    # Generating distance-to-layer-map
-    ct_dist_in = np.float32(distance_transform_edt(ct_den))
-    ct_dist_out = np.float32(distance_transform_edt(-ct_den+1))
-    ct_dist = ct_dist_in - ct_dist_out
-    del ct_dist_in
-    del ct_dist_out
-    write_mrc(ct_dist, fname=OUT_DIR + '/ct_' + str(p_id) + '_dist.mrc', v_size=1)
+    # Generation lyr
+    ct_lyr = gen_lyr(ct_den, layer_th, vx_sz, sigma)
+    write_mrc(ct_lyr, fname=OUT_DIR + '/ct_' + str(p_id) + '_lyr.mrc', v_size=1)
 
-    # Generating bilayer
+    # Generation blyr
+    ct_blyr_bas = gen_blyr_basic(ct_den,layer_sep,layer_th, vx_sz,sigma)
+    write_mrc(ct_blyr_bas, fname=OUT_DIR + '/ct_' + str(p_id) + '_blyr_bas.mrc', v_size=1)
 
-    # Taking the max and min value of the array
-    ct_max_v = ct_dist.max()
-    ct_min_v = ct_dist.min()
+    # Generation blyr expanded
+    ct_blyr_exp = gen_blyr_exp(ct_den, layer_sep, layer_th, vx_sz*.5, sigma, 2)
+    write_mrc(ct_blyr_exp, fname=OUT_DIR + '/ct_' + str(p_id) + '_blyr_exp.mrc', v_size=1)
 
-    thr_o = thr - oi_delta
-    ct_lyr_o = np.copy(ct_dist)
-    ct_lyr_o[(ct_lyr_o >= thr_o - layer_th) & (ct_lyr_o <= thr_o + layer_th)] = ct_max_v + 1
-    ct_lyr_o[ct_lyr_o < ct_max_v] = 0
-    ct_lyr_o[ct_lyr_o > 0] = 1
+    # Generation blyr expanded and reduced
+    ct_bylr_alt = reduce(ct_blyr_exp,2)
+    write_mrc(ct_bylr_alt, fname=OUT_DIR + '/ct_' + str(p_id) + '_blyr_alt.mrc', v_size=1)
 
-    thr_i = thr + oi_delta
-    ct_lyr_i = np.copy(ct_dist)
-    del ct_dist
-    ct_lyr_i[(ct_lyr_i >= thr_i - layer_th) & (ct_lyr_i <= thr_i + layer_th)] = ct_max_v + 1
-    ct_lyr_i[ct_lyr_i < ct_max_v] = 0
-    ct_lyr_i[ct_lyr_i > 0] = 1
-
-    ct_lyr_o = ct_lyr_o + ct_lyr_i
-    write_mrc(ct_lyr_o, fname=OUT_DIR + '/ct_' + str(p_id) + '_blyr.mrc', v_size=1)
-
-    """
-    # Generating the occupancy
-    hold_occ = memb.get_occ()
-    if hasattr(hold_occ, '__len__'):
-        hold_occ = OccGen(hold_occ).gen_occupancy()
-
-    # Membrane random generation by type
-    param_rg = (memb.get_min_rad(), math.sqrt(3) * max(VOI_SHAPE) * VOI_VSIZE, memb.get_max_ecc())
-    if memb.get_type() == 'curvatubes':
-        mb_ctv_generator = CtvGen(ctv_arr=curvatube)
-        set_mbs = SetMembranes(voi, VOI_VSIZE, mb_ctv_generator, param_rg, memb.get_thick_rg(),
-                               memb.get_layer_s_rg(), hold_occ, memb.get_over_tol(), bg_voi=bg_voi)
-        set_mbs.build_set(verbosity=True)
-        hold_den = set_mbs.get_tomo()
-        if memb.get_den_cf_rg() is not None:
-            hold_den *= mb_sph_generator.gen_den_cf(memb.get_den_cf_rg()[0], memb.get_den_cf_rg()[1])
-    else:
-        print('ERROR: Membrane type', memb.get_type(), 'not recognized!')
-        sys.exit()
-
-    # Density tomogram updating
-    voi = set_mbs.get_voi()
-    mb_mask = set_mbs.get_tomo() > 0
-    mb_mask[voi_inital_invert] = False
-    tomo_lbls[mb_mask] = entity_id
-    count_mbs += set_mbs.get_num_mbs()
-    mb_voxels += (tomo_lbls == entity_id).sum()
-    tomo_den = np.maximum(tomo_den, hold_den)
-    hold_vtp = set_mbs.get_vtp()
-    pp.add_label_to_poly(hold_vtp, entity_id, 'Entity', mode='both')
-    pp.add_label_to_poly(hold_vtp, LBL_MB, 'Type', mode='both')
-    if poly_vtp is None:
-        poly_vtp = hold_vtp
-        skel_vtp = hold_vtp
-    else:
-        poly_vtp = pp.merge_polys(poly_vtp, hold_vtp)
-        skel_vtp = pp.merge_polys(skel_vtp, hold_vtp)
-    synth_tomo.add_set_mbs(set_mbs, 'Membrane', entity_id, memb.get_type())
-    entity_id += 1
-
-# Tomogram statistics
-print('\t\t-TOMOGRAM', str(tomod_id), 'DENSITY STATISTICS:')
-print('\t\t\t+Membranes:', count_mbs, '#, ', mb_voxels * vx_um3, 'um**3, ', 100. * (mb_voxels / voi_voxels), '%')
-print('\t\t\t+Actin:', count_actins, '#, ', ac_voxels * vx_um3, 'um**3, ', 100. * (ac_voxels / voi_voxels), '%')
-print('\t\t\t+Microtublues:', count_mts, '#, ', mt_voxels * vx_um3, 'um**3, ', 100. * (mt_voxels / voi_voxels), '%')
-print('\t\t\t+Proteins:', count_prots, '#, ', cp_voxels * vx_um3, 'um**3, ', 100. * (cp_voxels / voi_voxels), '%')
-print('\t\t\t+Membrane proteins:', count_mb_prots, '#, ', mp_voxels * vx_um3, 'um**3, ', 100. * (mp_voxels / voi_voxels), '%')
-counts_total = count_mbs + count_actins + count_mts + count_prots + count_mb_prots
-total_voxels = mb_voxels + ac_voxels + mt_voxels + cp_voxels + mp_voxels
-print('\t\t\t+Total:', counts_total, '#, ', total_voxels * vx_um3, 'um**3, ', 100. * (total_voxels / voi_voxels), '%')
-print('\t\t\t+Time for generation: ', (time.time() - hold_time) / 60, 'mins')
-
-# Storing simulated density results
-tomo_den_out = TOMOS_DIR + '/tomo_den_' + str(tomod_id) + '.mrc'
-lio.write_mrc(tomo_den, tomo_den_out, v_size=VOI_VSIZE)
-synth_tomo.set_den(tomo_den_out)
-tomo_lbls_out = TOMOS_DIR + '/tomo_lbls_' + str(tomod_id) + '.mrc'
-lio.write_mrc(tomo_lbls, tomo_lbls_out, v_size=VOI_VSIZE)
-poly_den_out = TOMOS_DIR + '/poly_den_' + str(tomod_id) + '.vtp'
-lio.save_vtp(poly_vtp, poly_den_out)
-synth_tomo.set_poly(poly_den_out)
-poly_skel_out = TOMOS_DIR + '/poly_skel_' + str(tomod_id) + '.vtp'
-lio.save_vtp(skel_vtp, poly_skel_out)
-
-# TEM for 3D reconstructions
-temic = tem.TEM(TEM_DIR)
-vol = lio.load_mrc(tomo_den_out)
-temic.gen_tilt_series_imod(vol, TILT_ANGS, ax='Y')
-temic.add_mics_misalignment(MALIGN_MN, MALIGN_MX, MALIGN_SG)
-if DETECTOR_SNR is not None:
-    if hasattr(DETECTOR_SNR, '__len__'):
-        if len(DETECTOR_SNR) >= 2:
-            snr = round((DETECTOR_SNR[1] - DETECTOR_SNR[0])*random.random() + DETECTOR_SNR[0], 2)
-        else:
-            snr = DETECTOR_SNR[0]
-    else:
-        snr = DETECTOR_SNR
-    temic.add_detector_noise(snr)
-temic.invert_mics_den()
-temic.set_header(data='mics', p_size=(VOI_VSIZE, VOI_VSIZE, VOI_VSIZE))
-temic.recon3D_imod()
-temic.set_header(data='rec3d', p_size=(VOI_VSIZE, VOI_VSIZE, VOI_VSIZE), origin=(0, 0, 0))
-if DETECTOR_SNR is not None:
-    out_mics, out_tomo_rec = TOMOS_DIR + '/tomo_mics_' + str(tomod_id) + '_snr' + str(snr) + '.mrc', TOMOS_DIR + '/tomo_rec_' \
-                             + str(tomod_id) + '_snr' + str(snr) + '.mrc'
-else:
-    out_mics, out_tomo_rec = TOMOS_DIR + '/tomo_mics_' + str(tomod_id) + '.mrc', TOMOS_DIR + '/tomo_rec_' \
-                             + str(tomod_id) + '.mrc'
-shutil.copyfile(TEM_DIR + '/out_micrographs.mrc', out_mics)
-shutil.copyfile(TEM_DIR + '/out_rec3d.mrc', out_tomo_rec)
-synth_tomo.set_mics(out_mics)
-synth_tomo.set_tomo(out_tomo_rec)
-
-# Update the set
-set_stomos.add_tomos(synth_tomo)
-
-"""
 
 print('Successfully terminated. (' + time.strftime("%c") + ')')

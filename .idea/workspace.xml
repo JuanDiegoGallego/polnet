@@ -5,13 +5,31 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4ed438a5-f3d1-4596-8ebf-3302ea9ccf24" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/scripts/data_gen/curvatubes_v1.0.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/data_gen/curvatubes_v1.1.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/templates/mb_mrcs_10A/4pe5_mb_ref.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/templates/mb_mrcs_10A/4pe5_mb_ref.mrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui/align_membrane_proteins.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/gui/align_membrane_proteins.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/polnet/lrandom.py" beforeDir="false" afterPath="$PROJECT_DIR$/polnet/lrandom.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/polnet/membrane.py" beforeDir="false" afterPath="$PROJECT_DIR$/polnet/membrane.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/data_gen/all_features.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/data_gen/all_features.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/data_gen/cvt_aux.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/polnet.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/polnet.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_blyr.mrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_den.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_den.mrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_dist.mrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_raw.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_raw.mrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_blyr.mrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_den.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_den.mrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_dist.mrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_raw.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_raw.mrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_blyr.mrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_den.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_den.mrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_dist.mrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_raw.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_raw.mrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_blyr.mrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_den.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_den.mrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_dist.mrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_raw.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_raw.mrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_blyr.mrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_den.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_den.mrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_dist.mrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_raw.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_raw.mrc" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/data_gen/curvatubes_v1.1.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/data_gen/curvatubes_v1.1.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,7 +55,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/JuanDiegoGallego/polnet.git&quot;,
-    &quot;accountId&quot;: &quot;35bd28fd-dbdf-4763-9fa3-8525d0f6f2c8&quot;
+    &quot;accountId&quot;: &quot;9e89709b-a663-4441-8b1e-03d6e2f0358c&quot;
   }
 }</component>
   <component name="ProblemsViewState">
@@ -59,8 +77,8 @@
     &quot;Python.stomo.executor&quot;: &quot;Debug&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;last_opened_file_path&quot;: &quot;/home/juandi/PycharmProjects/polnet/scripts/data_gen&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;
+    &quot;last_opened_file_path&quot;: &quot;/home/tfg/PycharmProjects/polnet/venv/bin/python&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -146,7 +164,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-python-sdk-884f5ed5d46b-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.22855.92" />
+        <option value="bundled-python-sdk-d7ad00fb9fc3-c546a90a8094-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-242.23726.102" />
       </set>
     </attachedChunks>
   </component>
@@ -160,5 +178,21 @@
       <updated>1721747035566</updated>
     </task>
     <servers />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/scripts/data_gen/curvatubes_v1.1.py</url>
+          <line>14</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/polnet/membrane.py</url>
+          <line>7</line>
+          <option name="timeStamp" value="2" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
