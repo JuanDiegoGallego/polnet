@@ -465,6 +465,16 @@ class SetMembranes:
                                       center=p0, rot_q=rot_q, thick=thick, layer_s=layer_s,
                                       rad_a=tor_axes[0], rad_b=tor_axes[1])
                     hold_rad = np.mean(tor_axes)
+                elif isinstance(self.__gen_rnd_surfs, CubGen):
+                    rad = self.__gen_rnd_surfs.gen_parameters()
+                    hold_mb = MbCube(self.__voi.shape, v_size=self.__v_size,
+                                       center=p0, rot_q=rot_q, thick=thick, layer_s=layer_s, rad=rad, corner=2)
+                    hold_rad = rad
+                elif isinstance(self.__gen_rnd_surfs, CtvGen): # CURVATUBES
+                    ctv_arr = self.__gen_rnd_surfs.gen_parameters()
+                    hold_mb = MbCurvatubes(self.__voi.shape, ctv_arr=ctv_arr, v_size=self.__v_size,
+                                       center=p0, rot_q=rot_q, thick=thick, layer_s=layer_s, rad=rad)
+                    hold_rad = rad
                 else:
                     print('ERROR: not valid random surface parameters generator: ' + str(self.__gen_rnd_surfs.__class__))
                     raise MbError
@@ -589,3 +599,161 @@ class SetMembranes:
             self.__count_mbs += 1
         else:
             raise MbError
+
+class MbCube(Mb):
+    """
+    Class for generating a membrane with Cubic shape
+    """
+
+    def __init__(self, tomo_shape, v_size=1, center=(0, 0, 0), rot_q=(1, 0, 0, 0), thick=1, layer_s=1, rad=1, corner=2):
+        """
+        Constructor
+
+        :param tomo_shape: reference tomogram shape (X, Y and Z dimensions)
+        :param v_size: reference tomogram voxel size (default 1)
+        :param center: ellipsoid center (VERY IMPORTANT: coordinates are not in voxels)
+        :param rot_q: rotation expressed as quaternion with respect ellipsoid center (default [1, 0, 0, 0] no rotation)
+        :param thick: membrane thickness (default 1)
+        :param layer_s: Gaussian sigma for each layer
+        :param rad: (default 1) cube radius
+        :param corner: corner smoothness (2 = sphere)
+        """
+        super(MbCube, self).__init__(tomo_shape, v_size, center, rot_q, thick, layer_s)
+        assert (rad > 0)
+        self.__rad = float(rad)
+        self._Mb__build_tomos()
+        assert (corner >= 2)
+        self.__cor = float(corner)
+
+    def _Mb__build_tomos(self):
+
+        # Input parsing
+        t_v, s_v = .5 * (self._Mb__thick / self._Mb__v_size), self._Mb__layer_s / self._Mb__v_size
+        rad_v = self.__rad / self._Mb__v_size
+        cs = 6
+        ao_v = rad_v + t_v
+        ai_v = rad_v - t_v
+        ao_v_p1 = ao_v + 1
+        ao_v_m1 = ao_v - 1
+        ai_v_p1 = ai_v + 1
+        ai_v_m1 = ai_v - 1
+        p0_v = self._Mb__center / self._Mb__v_size
+
+        # Generating the bilayer
+        dx, dy, dz = float(self._Mb__tomo_shape[0]), float(self._Mb__tomo_shape[1]), float(self._Mb__tomo_shape[2])
+        dx2, dy2, dz2 = math.floor(.5 * dx), math.floor(.5 * dy), math.floor(.5 * dz)
+        p0_v[0] -= dx2
+        p0_v[1] -= dy2
+        p0_v[2] -= dz2
+        x_l, y_l, z_l = -dx2, -dy2, -dz2
+        x_h, y_h, z_h = -dx2 + dx, -dy2 + dy, -dz2 + dz
+        X, Y, Z = np.meshgrid(np.arange(x_l, x_h), np.arange(y_l, y_h), np.arange(z_l, z_h), indexing='xy')
+
+        # Mask generation
+        R_o = ((X - p0_v[0]) / ao_v) ** cs + ((Y - p0_v[1]) / ao_v) ** cs + ((Z - p0_v[2]) / ao_v) ** cs
+        R_i = ((X - p0_v[0]) / ai_v) ** cs + ((Y - p0_v[1]) / ai_v) ** cs + ((Z - p0_v[2]) / ai_v) ** cs
+        self._Mb__mask = tomo_rotate(np.logical_and(R_i >= 1, R_o <= 1), self._Mb__rot_q, order=0)
+
+        # Surface generation
+        R_i = ((X - p0_v[0]) / rad_v) ** cs + ((Y - p0_v[1]) / rad_v) ** cs + ((Z - p0_v[2]) / rad_v) ** cs
+        R_i = tomo_rotate(R_i, self._Mb__rot_q, mode='reflect')
+        self._Mb__surf = iso_surface(R_i, 1)
+        add_sfield_to_poly(self._Mb__surf, self._Mb__mask, 'mb_mask', dtype='int', interp='NN', mode='points')
+        self._Mb__surf = poly_threshold(self._Mb__surf, 'mb_mask', mode='points', low_th=.5)
+
+        # Outer layer
+        R_o = ((X - p0_v[0]) / ao_v_p1) ** cs + ((Y - p0_v[1]) / ao_v_p1) ** cs + ((Z - p0_v[2]) / ao_v_p1) ** cs
+        R_i = ((X - p0_v[0]) / ao_v_m1) ** cs + ((Y - p0_v[1]) / ao_v_m1) ** cs + ((Z - p0_v[2]) / ao_v_m1) ** cs
+        G = tomo_rotate(np.logical_and(R_i >= 1, R_o <= 1), self._Mb__rot_q, order=0)
+        # R = (X - p0_v[0])**2 + (Y - p0_v[1])**2 + (Z - p0_v[2])**2
+        # G = tomo_rotate(np.logical_and(R >= ao_v_m1**2, R <= ao_v_p1**2), self._Mb__rot_q, order=0)
+
+        # Inner layer
+        R_o = ((X - p0_v[0]) / ai_v_p1) ** cs + ((Y - p0_v[1]) / ai_v_p1) ** cs + ((Z - p0_v[2]) / ai_v_p1) ** cs
+        R_i = ((X - p0_v[0]) / ai_v_m1) ** cs + ((Y - p0_v[1]) / ai_v_m1) ** cs + ((Z - p0_v[2]) / ai_v_m1) ** cs
+        G += tomo_rotate(np.logical_and(R_i >= 1, R_o <= 1), self._Mb__rot_q, order=0)
+        # G += tomo_rotate(np.logical_and(R >= ai_v_m1**2, R_o <= ai_v_p1**2), self._Mb__rot_q, order=0)
+
+        # Smoothing
+        # TODO: is it required the density_norm() having lin_map()?
+        # self._Mb__tomo = lin_map(density_norm(sp.ndimage.gaussian_filter(G.astype(float), s_v), inv=True), ub=0, lb=1)
+        self._Mb__tomo = lin_map(-1 * sp.ndimage.gaussian_filter(G.astype(float), s_v), ub=0, lb=1)
+
+
+class MbCurvatubes(Mb): # CURVATUBES
+    """
+    Class for generating a Curvatube surface
+    """
+
+    def __init__(self, tomo_shape, ctv_arr, v_size=1, center=(0, 0, 0), rot_q=(1, 0, 0, 0), thick=1, layer_s=1, rad=1):
+        """
+        Constructor
+
+        :param tomo_shape: reference tomogram shape (X, Y and Z dimensions)
+        :paras: ctv_arr: np 3-dimensional array containing the surface
+        :param v_size: reference tomogram voxel size (default 1)
+        :param center: ellipsoid center (VERY IMPORTANT: coordinates are not in voxels)
+        :param rot_q: rotation expressed as quaternion with respect ellipsoid center (default [1, 0, 0, 0] no rotation)
+        :param thick: membrane thickness (default 1)
+        :param layer_s: Gaussian sigma for each layer
+        :param rad: (default 1) cube radius
+        :param corner: corner smoothness (2 = sphere)
+        """
+        super(MbCurvatubes, self).__init__(tomo_shape, v_size, center, rot_q, thick, layer_s)
+        assert (rad > 0)
+        self.__rad = float(rad)
+        self._Mb__build_tomos()
+
+    def _Mb__build_tomos(self):
+
+        # Input parsing
+        t_v, s_v = .5 * (self._Mb__thick / self._Mb__v_size), self._Mb__layer_s / self._Mb__v_size
+        rad_v = self.__rad / self._Mb__v_size
+        cs = 6
+        ao_v = rad_v + t_v
+        ai_v = rad_v - t_v
+        ao_v_p1 = ao_v + 1
+        ao_v_m1 = ao_v - 1
+        ai_v_p1 = ai_v + 1
+        ai_v_m1 = ai_v - 1
+        p0_v = self._Mb__center / self._Mb__v_size
+
+        # Generating the bilayer
+        dx, dy, dz = float(self._Mb__tomo_shape[0]), float(self._Mb__tomo_shape[1]), float(self._Mb__tomo_shape[2])
+        dx2, dy2, dz2 = math.floor(.5 * dx), math.floor(.5 * dy), math.floor(.5 * dz)
+        p0_v[0] -= dx2
+        p0_v[1] -= dy2
+        p0_v[2] -= dz2
+        x_l, y_l, z_l = -dx2, -dy2, -dz2
+        x_h, y_h, z_h = -dx2 + dx, -dy2 + dy, -dz2 + dz
+        X, Y, Z = np.meshgrid(np.arange(x_l, x_h), np.arange(y_l, y_h), np.arange(z_l, z_h), indexing='xy')
+
+        # Mask generation
+        R_o = ((X - p0_v[0]) / ao_v) ** cs + ((Y - p0_v[1]) / ao_v) ** cs + ((Z - p0_v[2]) / ao_v) ** cs
+        R_i = ((X - p0_v[0]) / ai_v) ** cs + ((Y - p0_v[1]) / ai_v) ** cs + ((Z - p0_v[2]) / ai_v) ** cs
+        self._Mb__mask = tomo_rotate(np.logical_and(R_i >= 1, R_o <= 1), self._Mb__rot_q, order=0)
+
+        # Surface generation
+        R_i = ((X - p0_v[0]) / rad_v) ** cs + ((Y - p0_v[1]) / rad_v) ** cs + ((Z - p0_v[2]) / rad_v) ** cs
+        R_i = tomo_rotate(R_i, self._Mb__rot_q, mode='reflect')
+        self._Mb__surf = iso_surface(R_i, 1)
+        add_sfield_to_poly(self._Mb__surf, self._Mb__mask, 'mb_mask', dtype='int', interp='NN', mode='points')
+        self._Mb__surf = poly_threshold(self._Mb__surf, 'mb_mask', mode='points', low_th=.5)
+
+        # Outer layer
+        R_o = ((X - p0_v[0]) / ao_v_p1) ** cs + ((Y - p0_v[1]) / ao_v_p1) ** cs + ((Z - p0_v[2]) / ao_v_p1) ** cs
+        R_i = ((X - p0_v[0]) / ao_v_m1) ** cs + ((Y - p0_v[1]) / ao_v_m1) ** cs + ((Z - p0_v[2]) / ao_v_m1) ** cs
+        G = tomo_rotate(np.logical_and(R_i >= 1, R_o <= 1), self._Mb__rot_q, order=0)
+        # R = (X - p0_v[0])**2 + (Y - p0_v[1])**2 + (Z - p0_v[2])**2
+        # G = tomo_rotate(np.logical_and(R >= ao_v_m1**2, R <= ao_v_p1**2), self._Mb__rot_q, order=0)
+
+        # Inner layer
+        R_o = ((X - p0_v[0]) / ai_v_p1) ** cs + ((Y - p0_v[1]) / ai_v_p1) ** cs + ((Z - p0_v[2]) / ai_v_p1) ** cs
+        R_i = ((X - p0_v[0]) / ai_v_m1) ** cs + ((Y - p0_v[1]) / ai_v_m1) ** cs + ((Z - p0_v[2]) / ai_v_m1) ** cs
+        G += tomo_rotate(np.logical_and(R_i >= 1, R_o <= 1), self._Mb__rot_q, order=0)
+        # G += tomo_rotate(np.logical_and(R >= ai_v_m1**2, R_o <= ai_v_p1**2), self._Mb__rot_q, order=0)
+
+        # Smoothing
+        # TODO: is it required the density_norm() having lin_map()?
+        # self._Mb__tomo = lin_map(density_norm(sp.ndimage.gaussian_filter(G.astype(float), s_v), inv=True), ub=0, lb=1)
+        self._Mb__tomo = lin_map(-1 * sp.ndimage.gaussian_filter(G.astype(float), s_v), ub=0, lb=1)

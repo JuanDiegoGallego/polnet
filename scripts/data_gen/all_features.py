@@ -34,7 +34,7 @@ from polnet import poly as pp
 from polnet.network import NetSAWLC, NetSAWLCInter, NetHelixFiber, NetHelixFiberB
 from polnet.polymer import FiberUnitSDimer, MTUnit, MB_DOMAIN_FIELD_STR
 from polnet.stomo import MmerFile, MbFile, SynthTomo, SetTomos, HelixFile, MTFile, ActinFile, MmerMbFile
-from polnet.lrandom import EllipGen, SphGen, TorGen, PGenHelixFiberB, PGenHelixFiber, SGenUniform, SGenProp, OccGen
+from polnet.lrandom import EllipGen, SphGen, TorGen, CubGen, PGenHelixFiberB, PGenHelixFiber, SGenUniform, SGenProp, OccGen
 from polnet.membrane import SetMembranes
 
 
@@ -42,9 +42,9 @@ from polnet.membrane import SetMembranes
 
 # Common tomogram settings
 ROOT_PATH = os.path.realpath(os.getcwd() + '/../../data')
-NTOMOS = 10 # 10 # 12
-VOI_SHAPE = (1000, 1000, 250) # (400, 400, 236) # (400, 400, 236) # vx or a path to a mask (1-foreground, 0-background) tomogram
-VOI_OFFS =  ((4,996), (4,996), (4,246)) # ((4,396), (4,396), (4,232)) # ((4,396), (4,396), (4,232)) # ((4,1852), (4,1852), (32,432)) # ((4,1852), (4,1852), (4,232)) # vx
+NTOMOS = 1 # 10 # 12
+VOI_SHAPE = (400, 400, 236) #(1000, 1000, 250) # (400, 400, 236) # (400, 400, 236) # vx or a path to a mask (1-foreground, 0-background) tomogram
+VOI_OFFS =  ((4,396), (4,396), (4,232)) #((4,996), (4,996), (4,246)) # ((4,396), (4,396), (4,232)) # ((4,396), (4,396), (4,232)) # ((4,1852), (4,1852), (32,432)) # ((4,1852), (4,1852), (4,232)) # vx
 VOI_VSIZE = 10 # 2.2 # A/vx
 MMER_TRIES = 20
 PMER_TRIES = 100
@@ -63,6 +63,19 @@ PROTEINS_LIST = ['in_10A/4v4r_10A.pns', 'in_10A/3j9i_10A.pns', 'in_10A/4v4r_50S_
 MB_PROTEINS_LIST = ['in_10A/mb_6rd4_10A.pms', 'in_10A/mb_5wek_10A.pms', 'in_10A/mb_4pe5_10A.pms',
                     'in_10A/mb_5ide_10A.pms', 'in_10A/mb_5gjv_10A.pms', 'in_10A/mb_5kxi_10A.pms',
                     'in_10A/mb_5tj6_10A.pms', 'in_10A/mb_5tqq_10A.pms', 'in_10A/mb_5vai_10A.pms']
+
+"""
+    Parametros para Juan Diego
+"""
+
+MEMBRANES_LIST = ['in_mbs/cube.mbs']
+
+HELIX_LIST = []
+
+PROTEINS_LIST = []
+
+MB_PROTEINS_LIST = []
+
 
 # Proportions list, specifies the proportion for each protein, this proportion is tried to be achieved but no guaranteed
 # The toal sum of this list must be 1
@@ -193,6 +206,14 @@ for tomod_id in range(NTOMOS):
             hold_den = set_mbs.get_tomo()
             if memb.get_den_cf_rg() is not None:
                 hold_den *= mb_tor_generator.gen_den_cf(memb.get_den_cf_rg()[0], memb.get_den_cf_rg()[1])
+        elif memb.get_type() == 'cube':
+            mb_sqr_generator = CubGen(radius_rg=(param_rg[0], param_rg[1]))
+            set_mbs = SetMembranes(voi, VOI_VSIZE, mb_sqr_generator, param_rg, memb.get_thick_rg(),
+                                   memb.get_layer_s_rg(), hold_occ, memb.get_over_tol(), bg_voi=bg_voi)
+            set_mbs.build_set(verbosity=True)
+            hold_den = set_mbs.get_tomo()
+            if memb.get_den_cf_rg() is not None:
+                hold_den *= mb_sqr_generator.gen_den_cf(memb.get_den_cf_rg()[0], memb.get_den_cf_rg()[1])
         else:
             print('ERROR: Membrane type', memb.get_type(), 'not recognized!')
             sys.exit()

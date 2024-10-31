@@ -1,0 +1,6 @@
+MODEL	LABEL
+bilayers coeffs [1 1 1 0 0 0] m -0.4.nii.gz	1
+exp 0366 coeffs [1 -0.238 11.988 -175.909 -27.167 2117.037] m -0.648.nii.gz	2
+exp 0374 coeffs [1 0.63 4.399 132.459 195.066 -2378.53] m -0.364.nii.gz	3
+tightlayers coeffs [3 3.741 11 -268 -4 6156] m -0.633.nii.gz	4
+exp 0868 coeffs [1 0.903 14.586 -57.566 -14.842 -1387.043] m -0.56.nii.gz	5

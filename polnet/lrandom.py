@@ -311,3 +311,46 @@ class OccGen():
         :return: a float with the generated occupancy
         """
         return random.uniform(self.__occ_rg[0], self.__occ_rg[1])
+
+class CubGen(SurfGen):
+    """
+    Class for model the parameters for modelling an Cube
+    """
+
+    def __init__(self, radius_rg):
+        """
+        Constructor
+
+        :param radius_rg: ranges for radius
+        """
+        assert hasattr(radius_rg, '__len__') and (len(radius_rg) == 2) and (radius_rg[0] <= radius_rg[1])
+        self.__radius_rg = radius_rg
+
+    def gen_parameters(self):
+        """
+        Generates randomly cube radii
+
+        :return: a float with the radius value
+        """
+        return random.uniform(self.__radius_rg[0], self.__radius_rg[1])
+
+class CtvGen(SurfGen):
+    """
+    Class for model the parameters for modeling Curvatubes # Curvatubes
+    """
+
+    def __init__(self, ctv_arr):
+        """
+        Constructor
+
+        :param ctv_arr: numpy array representing the surface
+        """
+        self.__ctv_arr = ctv_arr
+
+    def gen_parameters(self):
+        """
+        Generates randomly cube radii
+
+        :return: the numpy array
+        """
+        return self.__ctv_arr
