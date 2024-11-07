@@ -7,7 +7,7 @@ __author__ = 'Antonio Martinez-Sanchez'
 
 import csv
 from polnet.network import Network
-from polnet.membrane import SetMembranes
+from polnet.membrane.membrane import SetMembranes
 from polnet import poly as pp
 
 

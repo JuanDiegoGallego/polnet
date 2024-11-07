@@ -10,10 +10,9 @@ Test for checking a single simple tomogram with a categories of structures, curr
         + Completely Spatial Randomness with Volume exclusion: Uncorrelated macromolecules
         + Self-Avoiding Worm-Like Chain (SAWLC): Polyribosomes
 """
-import copy
 from unittest import TestCase
 
-from polnet.membrane import SetMembranes
+from polnet.membrane.membrane import SetMembranes
 from polnet.network import NetSAWLC, NetHelixFiber, NetHelixFiberB
 from polnet.lrandom import EllipGen, SphGen, TorGen, PGenHelixFiber, PGenHelixFiberB
 from polnet.polymer import FiberUnitSDimer, MTUnit

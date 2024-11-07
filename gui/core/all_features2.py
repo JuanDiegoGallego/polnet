@@ -7,11 +7,11 @@ from polnet.utils import *
 from polnet import lio
 from polnet import tem
 from polnet import poly as pp
-from polnet.network import NetSAWLC, NetSAWLCInter, NetHelixFiber, NetHelixFiberB
+from polnet.network import NetSAWLC, NetHelixFiber, NetHelixFiberB
 from polnet.polymer import FiberUnitSDimer, MTUnit, MB_DOMAIN_FIELD_STR
 from polnet.stomo import MmerFile, MbFile, SynthTomo, SetTomos, HelixFile, MTFile, ActinFile, MmerMbFile
-from polnet.lrandom import EllipGen, SphGen, TorGen, PGenHelixFiberB, PGenHelixFiber, SGenUniform, SGenProp, OccGen
-from polnet.membrane import SetMembranes
+from polnet.lrandom import EllipGen, SphGen, TorGen, PGenHelixFiberB, PGenHelixFiber, OccGen
+from polnet.membrane.membrane import SetMembranes
 
 def all_features2(NTOMOS, VOI_SHAPE, OUT_DIR, VOI_OFFS, VOI_VSIZE, MMER_TRIES, PMER_TRIES,
                   MEMBRANES_LIST, HELIX_LIST, PROTEINS_LIST, MB_PROTEINS_LIST, SURF_DEC,

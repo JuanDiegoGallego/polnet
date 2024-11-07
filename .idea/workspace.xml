@@ -4,33 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4ed438a5-f3d1-4596-8ebf-3302ea9ccf24" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/scripts/data_gen/cvt_aux.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/polnet.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/polnet.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_blyr.mrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_den.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_den.mrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_dist.mrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_raw.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_0_raw.mrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_blyr.mrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_den.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_den.mrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_dist.mrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_raw.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_1_raw.mrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_blyr.mrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_den.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_den.mrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_dist.mrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_raw.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_2_raw.mrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_blyr.mrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_den.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_den.mrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_dist.mrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_raw.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_3_raw.mrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_blyr.mrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_den.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_den.mrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_dist.mrc" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_raw.mrc" beforeDir="false" afterPath="$PROJECT_DIR$/data/curvatubes_mrc/ct_4_raw.mrc" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/data_gen/curvatubes_v1.1.py" beforeDir="false" afterPath="$PROJECT_DIR$/scripts/data_gen/curvatubes_v1.1.py" afterDir="false" />
-    </list>
+    <list default="true" id="4ed438a5-f3d1-4596-8ebf-3302ea9ccf24" name="Changes" comment="Generación de la bicapa con dos métodos. Se ven evidentes solapamientos debidos a la resolución." />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -177,7 +151,20 @@
       <option name="presentableId" value="Default" />
       <updated>1721747035566</updated>
     </task>
+    <task id="LOCAL-00001" summary="Generación de la bicapa con dos métodos. Se ven evidentes solapamientos debidos a la resolución.">
+      <option name="closed" value="true" />
+      <created>1730378381589</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1730378381589</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="Generación de la bicapa con dos métodos. Se ven evidentes solapamientos debidos a la resolución." />
+    <option name="LAST_COMMIT_MESSAGE" value="Generación de la bicapa con dos métodos. Se ven evidentes solapamientos debidos a la resolución." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

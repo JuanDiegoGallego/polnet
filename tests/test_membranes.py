@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 font = {'size'   : 11}
 matplotlib.rc('font', **font)
 
-from polnet.membrane import SetMembranes, MbTorus, MbEllipsoid, MbSphere
+from polnet.membrane.membrane import SetMembranes, MbTorus, MbEllipsoid, MbSphere
 from polnet.network import NetSAWLC, PGenHelixFiber
 from polnet.lrandom import EllipGen, SphGen, TorGen
 from polnet.polymer import MB_DOMAIN_FIELD_STR

@@ -28,11 +28,11 @@ from polnet.utils import *
 import matplotlib.pyplot as plt
 from polnet import lio
 from polnet import poly as pp
-from polnet.network import NetSAWLC, NetSAWLCInter, NetHelixFiber, NetHelixFiberB
+from polnet.network import NetSAWLC, NetHelixFiber, NetHelixFiberB
 from polnet.polymer import FiberUnitSDimer, MTUnit, MB_DOMAIN_FIELD_STR
-from polnet.stomo import MmerFile, MbFile, SynthTomo, SetTomos, HelixFile, MTFile, ActinFile, MmerMbFile
-from polnet.lrandom import EllipGen, SphGen, TorGen, PGenHelixFiberB, PGenHelixFiber, SGenUniform, SGenProp, OccGen
-from polnet.membrane import SetMembranes
+from polnet.stomo import MmerFile, MbFile, SynthTomo, HelixFile, MTFile, ActinFile, MmerMbFile
+from polnet.lrandom import EllipGen, SphGen, TorGen, PGenHelixFiberB, PGenHelixFiber, SGenUniform, SGenProp
+from polnet.membrane.membrane import SetMembranes
 
 
 ##### Input parameters

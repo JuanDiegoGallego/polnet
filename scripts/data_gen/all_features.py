@@ -26,16 +26,15 @@ import csv
 import time
 import random
 
-import numpy as np
 from polnet.utils import *
 from polnet import lio
 from polnet import tem
 from polnet import poly as pp
-from polnet.network import NetSAWLC, NetSAWLCInter, NetHelixFiber, NetHelixFiberB
+from polnet.network import NetSAWLC, NetHelixFiber, NetHelixFiberB
 from polnet.polymer import FiberUnitSDimer, MTUnit, MB_DOMAIN_FIELD_STR
 from polnet.stomo import MmerFile, MbFile, SynthTomo, SetTomos, HelixFile, MTFile, ActinFile, MmerMbFile
 from polnet.lrandom import EllipGen, SphGen, TorGen, CubGen, PGenHelixFiberB, PGenHelixFiber, SGenUniform, SGenProp, OccGen
-from polnet.membrane import SetMembranes
+from polnet.membrane.membrane import SetMembranes
 
 
 ##### Input parameters
