@@ -10,6 +10,8 @@ import random
 import numpy as np
 from abc import ABC, abstractmethod
 
+from vtkmodules.generate_pyi import has_self
+
 MAX_TRIES_ELLIP = 1e6
 MAX_TRIES_EXP = 1e6
 
@@ -312,45 +314,47 @@ class OccGen():
         """
         return random.uniform(self.__occ_rg[0], self.__occ_rg[1])
 
-class CubGen(SurfGen):
-    """
-    Class for model the parameters for modelling an Cube
-    """
-
-    def __init__(self, radius_rg):
-        """
-        Constructor
-
-        :param radius_rg: ranges for radius
-        """
-        assert hasattr(radius_rg, '__len__') and (len(radius_rg) == 2) and (radius_rg[0] <= radius_rg[1])
-        self.__radius_rg = radius_rg
-
-    def gen_parameters(self):
-        """
-        Generates randomly cube radii
-
-        :return: a float with the radius value
-        """
-        return random.uniform(self.__radius_rg[0], self.__radius_rg[1])
-
-class CtvGen(SurfGen):
+# JUAN DIEGO
+# TODO Pass more parameters for generation
+class CvtGen(SurfGen):
     """
     Class for model the parameters for modeling Curvatubes # Curvatubes
+    a20 always equals 1
+    eps always equals 0.02
     """
 
-    def __init__(self, ctv_arr):
+    def __init__(self,mass_rg=(-0.7,0.3),a11_a02_rg=(-10,10),b10_b01_rg=(-100,100),c_rg=(-1000,1000)):
         """
         Constructor
 
-        :param ctv_arr: numpy array representing the surface
+        :param mass_rg: range for mass
+        :param a11_a02_rg: range for a11 and a02
+        :param b10_b01_rg: range for b10 and b01
+        :param c_rg: range
         """
-        self.__ctv_arr = ctv_arr
+        assert hasattr(mass_rg, '__len__') and (len(mass_rg) == 2) and (mass_rg[0] <= mass_rg[1])
+        assert hasattr(a11_a02_rg, '__len__') and (len(a11_a02_rg) == 2) and (a11_a02_rg[0] <= a11_a02_rg[1])
+        assert hasattr(b10_b01_rg, '__len__') and (len(b10_b01_rg) == 2) and (b10_b01_rg[0] <= b10_b01_rg[1])
+        assert hasattr(c_rg, '__len__') and (len(c_rg) == 2) and (c_rg[0] <= c_rg[1])
+        self.__mass_rg = mass_rg
+        self.__a11_a02_rg = a11_a02_rg
+        self.__b10_b01_rg = b10_b01_rg
+        self.__c_rg = c_rg
 
     def gen_parameters(self):
         """
-        Generates randomly cube radii
+        Generates randomly the parameters needed for the generation of a curvatube following bounded uniform distributions
 
-        :return: the numpy array
+        :return: the eight parameters needed
         """
-        return self.__ctv_arr
+        a20 = 1
+        eps = 0.02
+        m = random.uniform(self.__mass_rg[0], self.__mass_rg[1])
+        a11 = random.uniform(self.__a11_a02_rg[0], self.__a11_a02_rg[1])
+        a02 = random.uniform(self.__a11_a02_rg[0], self.__a11_a02_rg[1])
+        b10 = random.uniform(self.__b10_b01_rg[0], self.__b10_b01_rg[1])
+        b01 = random.uniform(self.__b10_b01_rg[0], self.__b10_b01_rg[1])
+        c = random.uniform(self.__c_rg[0], self.__c_rg[1])
+
+        return eps, a20, a11, a02, b10, b01, c, m
+

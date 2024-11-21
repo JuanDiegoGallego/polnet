@@ -33,11 +33,7 @@ ROOT_PATH = os.path.realpath(os.getcwd() + '/../../data')
 
 # Lists with the features to simulate
 
-NII_LIST = ['bilayers coeffs [1 1 1 0 0 0] m -0.4.nii.gz',
-             'exp 0366 coeffs [1 -0.238 11.988 -175.909 -27.167 2117.037] m -0.648.nii.gz',
-             'exp 0374 coeffs [1 0.63 4.399 132.459 195.066 -2378.53] m -0.364.nii.gz',
-             'tightlayers coeffs [3 3.741 11 -268 -4 6156] m -0.633.nii.gz',
-             'exp 0868 coeffs [1 0.903 14.586 -57.566 -14.842 -1387.043] m -0.56.nii.gz']
+NII_LIST = ['img500x500x250.nii.gz']
 
 # SOURCE FILES
 SRC_DIR = os.path.realpath(ROOT_PATH + '/curvatubes_gallery')
@@ -92,12 +88,12 @@ for p_id, p_file in enumerate(NII_LIST):
     write_mrc(ct_blyr_bas, fname=OUT_DIR + '/ct_' + str(p_id) + '_blyr_bas.mrc', v_size=1)
 
     # Generation blyr expanded
-    ct_blyr_exp = gen_blyr_exp(ct_den, layer_sep, layer_th, vx_sz*.5, sigma, 2)
-    write_mrc(ct_blyr_exp, fname=OUT_DIR + '/ct_' + str(p_id) + '_blyr_exp.mrc', v_size=1)
+    #ct_blyr_exp = gen_blyr_exp(ct_den, layer_sep, layer_th, vx_sz*.5, sigma, 2)
+    #write_mrc(ct_blyr_exp, fname=OUT_DIR + '/ct_' + str(p_id) + '_blyr_exp.mrc', v_size=1)
 
     # Generation blyr expanded and reduced
-    ct_bylr_alt = reduce(ct_blyr_exp,2)
-    write_mrc(ct_bylr_alt, fname=OUT_DIR + '/ct_' + str(p_id) + '_blyr_alt.mrc', v_size=1)
+    #ct_bylr_alt = reduce(ct_blyr_exp,2)
+    #write_mrc(ct_bylr_alt, fname=OUT_DIR + '/ct_' + str(p_id) + '_blyr_alt.mrc', v_size=1)
 
 
 print('Successfully terminated. (' + time.strftime("%c") + ')')
