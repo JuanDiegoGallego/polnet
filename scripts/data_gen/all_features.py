@@ -45,8 +45,8 @@ ROOT_PATH = os.path.realpath(os.getcwd() + '/../../data')
 NTOMOS = 1 # 10 # 12
 #VOI_SHAPE = (400, 400, 236) #(1000, 1000, 250) # (400, 400, 236) # (400, 400, 236) # vx or a path to a mask (1-foreground, 0-background) tomogram
 #VOI_OFFS =  ((4,396), (4,396), (4,232)) #((4,996), (4,996), (4,246)) # ((4,396), (4,396), (4,232)) # ((4,396), (4,396), (4,232)) # ((4,1852), (4,1852), (32,432)) # ((4,1852), (4,1852), (4,232)) # vx
-VOI_SHAPE = (200, 200, 160)
-VOI_OFFS  =  ((4,196),(4,196),(4,156))
+VOI_SHAPE = (200, 200, 200)
+VOI_OFFS  =  ((4,196),(4,196),(4,196))
 VOI_VSIZE = 10 # 2.2 # A/vx
 MMER_TRIES = 20
 PMER_TRIES = 100
@@ -74,7 +74,7 @@ MEMBRANES_LIST = ['in_mbs/curvatubes.mbs']
 
 HELIX_LIST = []
 
-PROTEINS_LIST = ['in_10A/4v4r_10A.pns']
+PROTEINS_LIST = ['in_10A/4v4r_10A.pns', 'in_10A/3j9i_10A.pns']
 
 MB_PROTEINS_LIST = ['in_10A/mb_6rd4_10A.pms']
 
@@ -85,7 +85,7 @@ PROP_LIST = None # [.4, .6]
 if PROP_LIST is not None:
     assert sum(PROP_LIST) == 1
 
-SURF_DEC = 0.9 # Target reduction factor for surface decimation (default None)
+SURF_DEC = 0.1 # Target reduction factor for surface decimation (default None)
 
 # Reconstruction tomograms
 TILT_ANGS = np.arange(-60, 60, 3) # range(-90, 91, 3) # at MPI-B IMOD only works for ranges

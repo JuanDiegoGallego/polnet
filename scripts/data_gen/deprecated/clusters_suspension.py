@@ -47,7 +47,7 @@ PROP_LIST = [.4, .6]
 assert sum(PROP_LIST) == 1
 
 DIST_OFF = 5 # A / vx
-SURF_DEC = 0.9 # Target reduction factor for surface decimation (defatul None)
+SURF_DEC = 0.1 # Target reduction factor for surface decimation (defatul None)
 
 # Reconstruction tomograms
 TILT_ANGS = range(-60, 61, 3) # np.arange(-60, 60, 3) # at MPI-B IMOD only works for ranges

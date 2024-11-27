@@ -5,6 +5,7 @@ A membrane is modelled as two parallel surfaces with Gaussian profile
 
 __author__ = 'Antonio Martinez-Sanchez'
 
+import numpy as np
 import scipy as sp
 from polnet.poly import *
 from polnet.affine import *
@@ -466,9 +467,9 @@ class SetMembranes:
                     hold_rad = np.mean(tor_axes)
                 elif isinstance(self.__gen_rnd_surfs, CvtGen):
                     #cvt_parameters = self.__gen_rnd_surfs.gen_parameters()
-                    cvt_parameters = (0.02, 1, 0.85, 6, -80, -7.5, 1770, -0.42)
+                    cvt_parameters = (0.02, 0.997, 1.321, 3.619, -88.68, 1.718, 2053.259, -0.614) # SET PARAMETERS MANUALLY
                     hold_mb = MbCurvatubes(self.__voi.shape, cvt_params=cvt_parameters, v_size=self.__v_size,
-                                       center=p0, rot_q=rot_q, thick=thick, layer_s=layer_s)
+                                       center=p0, rot_q=np.asarray((1,0,0,0), dtype=float), thick=thick, layer_s=layer_s) # TODO The rotation is neutral
                 else:
                     print('ERROR: not valid random surface parameters generator: ' + str(self.__gen_rnd_surfs.__class__))
                     raise MbError
@@ -610,8 +611,8 @@ class MbCurvatubes(Mb):
 
         :param tomo_shape: reference tomogram shape (X, Y and Z dimensions)
         :param v_size: reference tomogram voxel size (default 1)
-        :param center: ellipsoid center (VERY IMPORTANT: coordinates are not in voxels)
-        :param rot_q: rotation expressed as quaternion with respect ellipsoid center (default [1, 0, 0, 0] no rotation)
+        :param center: ellipsoid center (VERY IMPORTANT: coordinates are not in voxels). Useless in curvatubes
+        :param rot_q: rotation expressed as quaternion with respect ellipsoid center (default [1, 0, 0, 0] no rotation) Useless in curvatubes
         :param thick: membrane thickness (default 1)
         :param layer_s: Gaussian sigma for each layer
         :param ctv_params: Parameters for the generation of the shape: (eps, a20, a11, a02, b10, b01, c, mass)
@@ -648,15 +649,17 @@ class MbCurvatubes(Mb):
         ct_den = ndimage.binary_dilation(ct_den) - ct_den
         from scipy.ndimage import median_filter, distance_transform_edt
         ct_dist = np.float32(distance_transform_edt(1 - ct_den))
-        self._Mb__mask = ct_dist<=t_v
-
-        self._Mb__mask = tomo_rotate(self._Mb__mask, self._Mb__rot_q, order=0)
+        self._Mb__mask = np.copy(ct_dist<=t_v)
+        # self._Mb__mask = tomo_rotate(self._Mb__mask, self._Mb__rot_q, order=0) # No rotation required
         if self._Mb__mask.sum() == 0:
             raise MbError
 
         # Surface generation
-        R_i = tomo_rotate(ct_dist, self._Mb__rot_q, mode='reflect')
-        self._Mb__surf = iso_surface(R_i, 0)
+        R_i = np.copy(ct_dist)
+        # R_i = tomo_rotate(ct_dist, self._Mb__rot_q, mode='reflect')
+        # R_i[R_i > 0] = 1
+        from ..lio import write_mrc
+        self._Mb__surf = iso_surface(R_i, 0.5)
         add_sfield_to_poly(self._Mb__surf, self._Mb__mask, 'mb_mask', dtype='int', interp='NN', mode='points')
         self._Mb__surf = poly_threshold(self._Mb__surf, 'mb_mask', mode='points', low_th=.5)
 

@@ -83,6 +83,36 @@ def poly_scale(in_vtp, s):
     :param s: scaling factor
     :return: the transformed vtkPolyData
     """
+
+    if in_vtp is None:
+        raise ValueError("Input polydata is None!")
+    if not isinstance(in_vtp, vtk.vtkPolyData):
+        raise ValueError("Input data is not vtkPolyData!")
+    if in_vtp.GetNumberOfCells() == 0:
+        raise ValueError("Input polydata is empty!")
+
+        # Check scaling factor
+    if s <= 0:
+        raise ValueError("Scaling factor must be greater than 0!")
+
+        # Create and apply the transformation (scaling)
+    box_sc = vtk.vtkTransform()
+    box_sc.Scale(s, s, s)
+
+    # Apply the transform using vtkTransformPolyDataFilter
+    tr_box = vtk.vtkTransformPolyDataFilter()
+    tr_box.SetInputData(in_vtp)
+    tr_box.SetTransform(box_sc)
+
+    # Update the filter and check for issues
+    try:
+        tr_box.Update()
+    except Exception as e:
+        print(f"Error during Update: {e}")
+
+
+
+
     # Translation
     box_sc = vtk.vtkTransform()
     box_sc.Scale(s, s, s)
