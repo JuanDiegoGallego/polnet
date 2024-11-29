@@ -467,7 +467,7 @@ class SetMembranes:
                     hold_rad = np.mean(tor_axes)
                 elif isinstance(self.__gen_rnd_surfs, CvtGen):
                     #cvt_parameters = self.__gen_rnd_surfs.gen_parameters()
-                    cvt_parameters = (0.02, 0.997, 1.321, 3.619, -88.68, 1.718, 2053.259, -0.614) # SET PARAMETERS MANUALLY
+                    cvt_parameters = (0.02, 1, 1, 1, 0, 0, 0, -0.5) # SET PARAMETERS MANUALLY
                     hold_mb = MbCurvatubes(self.__voi.shape, cvt_params=cvt_parameters, v_size=self.__v_size,
                                        center=p0, rot_q=np.asarray((1,0,0,0), dtype=float), thick=thick, layer_s=layer_s) # TODO The rotation is neutral
                 else:
@@ -621,7 +621,7 @@ class MbCurvatubes(Mb):
         assert(len(cvt_params)==8)
         assert( (-1 <= cvt_params[7]) & (cvt_params[7] <= 1) )
         self.__cvt_params = cvt_params
-        self.__delta_x = 1/200 # This value is provisional until the correlation between delta_x and curvature
+        self.__delta_x = 1/300 # This value is provisional until the correlation between delta_x and curvature
         self._Mb__build_tomos()
 
     def _Mb__build_tomos(self):
@@ -633,7 +633,7 @@ class MbCurvatubes(Mb):
         delta_x = self.__delta_x
         thr = 0 # Threshold marking what is inside
 
-        optim_props = {'maxeval': 10000, 'sigma_blur': self._Mb__layer_s, 'lr': .001, 'eps_adam': 1e-2,
+        optim_props = {'maxeval': 5000, 'sigma_blur': 3, 'lr': .001, 'eps_adam': 1e-2, # Parametros a mano
                        'betas': (0.9, 0.999), 'weight_decay': 0, 'amsgrad': False,
                        'display_it_nb': 1000, 'fill_curve_nb': 50}
 
