@@ -12,7 +12,7 @@ from polnet.affine import *
 from polnet.lrandom import *
 from abc import ABC, abstractmethod
 
-MAX_TRIES_MB = 1 # TODO Changed fron 10 to 1 to test curvatubes
+MAX_TRIES_MB = 10 # TODO Changed from 10 to 1 to test curvatubes
 
 
 class MbError(Exception):
@@ -292,7 +292,7 @@ class MbSphere(Mb):
         # Smoothing
         # TODO: is it required the density_norm() having lin_map()?
         # self._Mb__tomo = lin_map(density_norm(sp.ndimage.gaussian_filter(G.astype(float), s_v), inv=True), ub=0, lb=1)
-        self._Mb__tomo = lin_map(-1 * sp.ndimage.gaussian_filter(G.astype(float), s_v), ub=0, lb=1)
+        self._Mb__tomo = lin_map(-1 * sp.ndimage.gaussian_filter(G.astype(float), 0.3), ub=0, lb=1)
 
 
 class MbTorus(Mb):
@@ -467,9 +467,12 @@ class SetMembranes:
                     hold_rad = np.mean(tor_axes)
                 elif isinstance(self.__gen_rnd_surfs, CvtGen):
                     #cvt_parameters = self.__gen_rnd_surfs.gen_parameters()
-                    cvt_parameters = (0.02, 1, 1, 1, 0, 0, 0, -0.5) # SET PARAMETERS MANUALLY
+
+                    # 0.02, 1, 0.396, 1.095, -28.64, 190.906, 2062.082, -0.598 Presentacion
+
+                    cvt_parameters = (0.02, 1, 1.629, 0.962, -7.9, -11.994, 15.806, -0.313 ) # SET PARAMETERS MANUALLY
                     hold_mb = MbCurvatubes(self.__voi.shape, cvt_params=cvt_parameters, v_size=self.__v_size,
-                                       center=p0, rot_q=np.asarray((1,0,0,0), dtype=float), thick=thick, layer_s=layer_s) # TODO The rotation is neutral
+                                       center=p0, rot_q=np.asarray((1,0,0,0), dtype=float), thick=thick, layer_s=layer_s)
                 else:
                     print('ERROR: not valid random surface parameters generator: ' + str(self.__gen_rnd_surfs.__class__))
                     raise MbError
@@ -633,7 +636,7 @@ class MbCurvatubes(Mb):
         delta_x = self.__delta_x
         thr = 0 # Threshold marking what is inside
 
-        optim_props = {'maxeval': 5000, 'sigma_blur': 3, 'lr': .001, 'eps_adam': 1e-2, # Parametros a mano
+        optim_props = {'maxeval': 6000, 'sigma_blur': 3, 'lr': .001, 'eps_adam': 1e-2, # Parametros a mano
                        'betas': (0.9, 0.999), 'weight_decay': 0, 'amsgrad': False,
                        'display_it_nb': 1000, 'fill_curve_nb': 50}
 
@@ -655,11 +658,11 @@ class MbCurvatubes(Mb):
             raise MbError
 
         # Surface generation
-        R_i = np.copy(ct_dist)
+        #R_i = np.copy(ct_dist)
         # R_i = tomo_rotate(ct_dist, self._Mb__rot_q, mode='reflect')
         # R_i[R_i > 0] = 1
         from ..lio import write_mrc
-        self._Mb__surf = iso_surface(R_i, 0.5)
+        self._Mb__surf = iso_surface(ct_dist, 0.5)
         add_sfield_to_poly(self._Mb__surf, self._Mb__mask, 'mb_mask', dtype='int', interp='NN', mode='points')
         self._Mb__surf = poly_threshold(self._Mb__surf, 'mb_mask', mode='points', low_th=.5)
 
@@ -667,9 +670,16 @@ class MbCurvatubes(Mb):
         ct_dist = np.float32(distance_transform_edt(1-self._Mb__mask))
         ct_max_v = ct_dist.max() * 2
 
+        """
         ct_dist[(t_v_m1 <= ct_dist) & (t_v_p1 >= ct_dist)] = ct_max_v
         ct_dist[ct_dist < ct_max_v] = 0
         ct_dist[ct_dist > 0] = 1
+        """
+
+        ct_dist[(ct_dist<t_v)] = ct_max_v * 3
+        ct_dist[ct_dist<ct_max_v*2] = 0
+        ct_dist[ct_dist!=0] = 1
+        ct_dist = ct_dist - ct_den
 
         # Smoothing
         self._Mb__tomo = lin_map(density_norm(sp.ndimage.gaussian_filter(ct_dist.astype(float), s_v), inv=True), ub=0, lb=1)
