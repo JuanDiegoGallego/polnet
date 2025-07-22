@@ -8,10 +8,7 @@ Created on Mon Dec 7 14:35:20 2020
 Main wrapper function for generating 3D tubular and membranous shape textures.
 
 See my article at       https://arxiv.org/abs/2103.04856
-
-
 Note: convention that u has shape (Z,X,Y)
-
 """
 
 import time
@@ -27,11 +24,12 @@ from cvtub.filters import my_custom_GradHess
 from cvtub.energy import polykap_deg2, ratio_discr
 
 
-def _generate_shape(v0, params, delta_x, xi, optim_method, optim_props, 
+def _generate_shape(tomo_shape, params, delta_x, xi, optim_method, optim_props, 
                     flow_type, mode, M0 = None,
                    snapshot_folder = '', exp_title = '',
                    cond_take_snapshot = None, display_all = True, 
-                   return_var = False, return_energy = False, check_viable = False) :
+                   return_var = False, return_energy = False, check_viable = False,
+                   verbose=False, seed=None) :
     
     ''' Optimizes the phase-field energy 
     
@@ -64,9 +62,8 @@ def _generate_shape(v0, params, delta_x, xi, optim_method, optim_props,
         optim_props: internal parameters of Adam or BFGS
             note: I also included the sigma_blur of the Gaussian kernel there
 
-        v0: initialization
-            = u0 if flow_type = 'L2', 'averm0'
-            = A0 if flow_type = 'cons', with change of variable u = div A + M0
+        tomo_shape:
+            Z, X, Y dimensions of the tomogram
         
         M0: imposed mass (i.e. average) of u, between -1 and 1
             if flow_type = 'averm0' or 'cons'
@@ -83,6 +80,13 @@ def _generate_shape(v0, params, delta_x, xi, optim_method, optim_props,
                where k is a small Gaussian blur,
                although by a small abuse of notation we omit k
         cond_take_snapshot(iteration) is True when it is time to take a photo of u
+
+        verbose:
+            verbosity flag
+
+        seed:
+            rng seed for v0 initialitation.
+            If none, a system 
         
     '''
     
@@ -104,6 +108,20 @@ def _generate_shape(v0, params, delta_x, xi, optim_method, optim_props,
     if M0 is not None and flow_type == 'averm0' :
         raise ValueError("Set M0 = None because in flow_type = 'averm0', the mass is just the one of u0 at start")
     
+    # Initialize v0: a random scalar field with values in R^3
+    dtype = torch.cuda.FloatTensor # if torch.cuda is available else torch.FloatTensor
+    Z, X, Y = tomo_shape
+    if verbose:
+        print("Starting Curvatubes surface-generation process")
+        if seed is not None:
+            print(f"Using seed {seed}")
+    rng = np.random.RandomState(seed)
+    v0 = 40 * delta_x * rng.rand(3, Z, X, Y)
+    if torch.cuda.is_available():
+        v0 = torch.Tensor(v0).type(torch.cuda.FloatTensor)
+    else:
+        v0 = torch.Tensor(v0).type(torch.FloatTensor)
+
     spatialized = False
     for x in params: # if one of the parameters is space-dependent then spatialized = True
         #if type(x) != int and type(x) != float:
@@ -187,10 +205,10 @@ def _generate_shape(v0, params, delta_x, xi, optim_method, optim_props,
             title += ' mu {} theta = {}'.format(mu, theta)
     else :
         title += '\n' + 'coeffs spatialized'
-            
-    print(title)
-    print('dx = {:.3f}, LZ = {:.2f}, LX = {:.3f}, LY = {:.3f}, xi = {}'.format(delta_x,LZ,LX,LY,xi))
-    print(optim_props)
+    if verbose:    
+        print(title)
+        print('dx = {:.3f}, LZ = {:.2f}, LX = {:.3f}, LY = {:.3f}, xi = {}'.format(delta_x,LZ,LX,LY,xi))
+        print(optim_props)
 
 
     '''Lets go!! '''
@@ -224,9 +242,10 @@ def _generate_shape(v0, params, delta_x, xi, optim_method, optim_props,
     if flow_type == 'averm0' :
         M0 = u.mean()
     
-    print('')
-    print(" umin = {}, umax = {}".format(u.min().item(), u.max().item()) )
-    print(" m =  {:.3f} \n".format(u.mean().item()) )
+    if verbose:
+        print('')
+        print(" umin = {}, umax = {}".format(u.min().item(), u.max().item()) )
+        print(" m =  {:.3f} \n".format(u.mean().item()) )
     
     # prepare the optimizers + PyTorch
     
@@ -267,7 +286,7 @@ def _generate_shape(v0, params, delta_x, xi, optim_method, optim_props,
         #else :
         #    Fid = 0
                     
-        if n_evals % display_it_nb == 0 :
+        if n_evals % display_it_nb == 0 and verbose :
             print('E = {}'.format(E.item()))
 
         n_evals += 1
