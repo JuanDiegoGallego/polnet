@@ -308,7 +308,7 @@ class CvtGen(SurfGen):
         if cvt_params is not None:
             assert hasattr(cvt_params,'__len__') and (len(cvt_params) == 8) and (-1.0 <= cvt_params[7]) and (cvt_params[7] <= 1.0)
             self.__cvt_params = cvt_params
-        else
+        else:
             self.__cvt_params = None
         self.__mass_rg = mass_rg
         self.__a11_rg = a11_rg
