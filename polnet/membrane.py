@@ -10,6 +10,7 @@ from polnet.poly import *
 from polnet.affine import *
 from polnet.lrandom import *
 from abc import ABC, abstractmethod
+from cvtub.generator import _generate_shape 
 
 MAX_TRIES_MB = 10
 
@@ -408,12 +409,12 @@ class MbCurvatubes(Mb):
         # tomo_shape = self._Mb__tomo_shape
         u = _generate_shape(params=(eps, a20, a11, a02, b10, b01, c), tomo_shape=(500,500,250),
                         delta_x=delta_x, xi=1e-6, optim_method='adam', optim_props=optim_props,
-                        flow_type='cons', mode='periodic', M0=M0, verbose=False)
+                        flow_type='cons', mode='periodic', M0=M0, verbose=False, display_all=False)
         
         # Resizing
-        from scipy.ndimage import zoom
-        u = zoom(u, 2, order=3)
-        u = u[:,:,:250]
+        # from scipy.ndimage import zoom
+        # u = zoom(u, 2, order=3)
+        # u = u[:,:,:250]
 
         # Mask generation
         ct_den = np.copy(u)
@@ -466,7 +467,7 @@ class SetMembranes:
         # Input parsing
         assert isinstance(voi, np.ndarray) and (voi.dtype == bool)
         assert issubclass(gen_rnd_surfs.__class__, SurfGen)
-        assert hasattr(param_rg, '__len__') and (len(param_rg) == 3) and (param_rg[0] <= param_rg[1])
+        assert hasattr(param_rg, '__len__') and (len(param_rg) == 3)
         assert hasattr(thick_rg, '__len__') and (len(thick_rg) == 2) and (thick_rg[0] <= thick_rg[1])
         assert hasattr(layer_rg, '__len__') and (len(layer_rg) == 2) and (layer_rg[0] <= layer_rg[1])
         assert (occ >= 0) and (occ <= 100)

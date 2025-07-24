@@ -419,7 +419,7 @@ def _generate_shape(tomo_shape, params, delta_x, xi, optim_method, optim_props,
         ax[1,1].plot(fill_curve_nb * np.arange(len(M_curve)),M_curve)
         ax[1,1].set_title('mass_curve')
         
-        fig.savefig(snapshot_folder + 'Curves/' + exp_title + title + ' curves.png')
+        #fig.savefig(snapshot_folder + 'Curves/' + exp_title + title + ' curves.png')
         #plt.show()
         
         if False :

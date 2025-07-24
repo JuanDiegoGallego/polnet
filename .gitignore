@@ -21,3 +21,6 @@ data_generated
 # Files
 pyvenv.cfg
 polnet/_version.py
+
+# Metadata
+meta.txt
